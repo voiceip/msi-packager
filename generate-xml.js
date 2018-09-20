@@ -12,11 +12,13 @@ function generateXml(options, cb) {
     var optionsWithIds = Object.create(options)
     optionsWithIds.componentIds = ids
 
-    cb(null, installerFor(components, optionsWithIds).toXml({pretty: true}))
+    cb(null, installerFor(components, optionsWithIds).toXml({
+      pretty: true
+    }))
   })
 }
 
-function installerFor (components, options) {
+function installerFor(components, options) {
   return el('Wix', {
     xmlns: 'http://schemas.microsoft.com/wix/2006/wi'
   }, [
@@ -48,35 +50,35 @@ function installerFor (components, options) {
       ]),
 
       options.runAfter ? el('Property', {
-	Id: "cmd",
-	Value: "cmd.exe"
+        Id: "cmd",
+        Value: "cmd.exe"
       }) : "",
 
       options.runAfter ? el('CustomAction', {
-	  Id: "LaunchApplication",
-	  ExeCommand: "/c start \"\" \"%programfiles%\\"+options.name+"\\"+options.executable+"\"",
-	  Execute: "",
-	  Property: "cmd",
-	  Impersonate: "yes"
+        Id: "LaunchApplication",
+        ExeCommand: "/c start \"\" \"%programfiles%\\" + options.name + "\\" + options.executable + "\"",
+        Execute: "",
+        Property: "cmd",
+        Impersonate: "yes"
       }) : "",
 
       el('InstallExecuteSequence', [
         el('RemoveExistingProducts', {
-          Before: "InstallInitialize" 
+          Before: "InstallInitialize"
         }),
-	options.runAfter ? el('Custom', {
-	  Action: 'LaunchApplication',
-	  After: 'InstallFinalize'
-	}, ["NOT Installed"]) : ""
+        options.runAfter ? el('Custom', {
+          Action: 'LaunchApplication',
+          After: 'InstallFinalize'
+        }, ["NOT Installed"]) : ""
       ]),
 
       el('CustomAction', {
-	Id: "LaunchInstalledExe",
-	FileKey: "mainExecutableFile", // what goes here?
-	ExeCommand: "",                // and here?
-	Execute: "immediate",
-	Impersonate: "yes",
-	Return: "asyncNoWait"
+        Id: "LaunchInstalledExe",
+        FileKey: "mainExecutableFile", // what goes here?
+        ExeCommand: "", // and here?
+        Execute: "immediate",
+        Impersonate: "yes",
+        Return: "asyncNoWait"
       }),
 
       el('Package', {
@@ -103,11 +105,11 @@ function installerFor (components, options) {
       }),
 
       el('Directory', {
-        Id: 'TARGETDIR', 
+        Id: 'TARGETDIR',
         Name: 'SourceDir'
       }, [
         el('Directory', {
-          Id: getProgramsFolder(options), 
+          Id: getProgramsFolder(options),
         }, [
           el('Directory', {
             Id: 'INSTALLDIR',
@@ -120,23 +122,25 @@ function installerFor (components, options) {
         Id: 'App',
         Level: '1'
       }, options.componentIds.map(function(id) {
-        return el('ComponentRef', { Id: id })
+        return el('ComponentRef', {
+          Id: id
+        })
       }))
 
     ])
   ])
 }
 
-function getComponents (path, options, cb) {
+function getComponents(path, options, cb) {
   var fullPath = join(options.source, path)
   var ids = []
 
-  fs.readdir(fullPath, function (err, entries) {
+  fs.readdir(fullPath, function(err, entries) {
     if (err) return cb(err)
     entries = entries.filter(function(entry) {
       return entry !== '.DS_Store'
     })
-    map(entries, function (entry, next) {
+    map(entries, function(entry, next) {
       var subPath = join(path, entry)
       fs.stat(join(fullPath, entry), function(err, stats) {
         if (err) return next(err)
@@ -157,7 +161,7 @@ function getComponents (path, options, cb) {
             el('File', {
               Id: id,
               Source: join(fullPath, entry),
-              Name: entry 
+              Name: entry
             })
           ]
 
@@ -187,14 +191,14 @@ function getComponents (path, options, cb) {
           }, items))
         }
       })
-    }, function (err, components) {
+    }, function(err, components) {
       if (err) return cb(err)
       cb(null, components, ids)
     })
   })
 }
 
-function getProgramsFolder (options) {
+function getProgramsFolder(options) {
   if (options.localInstall) {
     return 'LocalAppDataFolder'
   } else {
@@ -206,6 +210,6 @@ function getProgramsFolder (options) {
   }
 }
 
-function escapeId (id) {
+function escapeId(id) {
   return encodeURIComponent(id)
 }

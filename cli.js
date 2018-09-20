@@ -4,8 +4,8 @@ var packageMsi = require('./')
 var path = require('path')
 
 var opts = require("nomnom")
-   .script("msi-packager")
-   .options({
+  .script("msi-packager")
+  .options({
 
     'source': {
       position: 0,
@@ -23,7 +23,7 @@ var opts = require("nomnom")
       abbr: 'n',
       required: true
     },
-    
+
     'version': {
       abbr: 'v',
       help: 'Specify application version',
@@ -46,7 +46,7 @@ var opts = require("nomnom")
       help: 'Specify GUID to use for upgrading from other versions',
       required: true
     },
-    
+
     'iconPath': {
       abbr: 'i',
       full: 'icon',
@@ -62,9 +62,15 @@ var opts = require("nomnom")
 
     'runAfter': {
       abbr: 'r',
-	flag: true,
+      flag: true,
       full: 'run-after',
       help: 'Run the application after installation completes'
+    },
+
+    'postInst': {
+      abbr: 'p',
+      full: 'post-inst',
+      help: 'postrun script (for nonlocal installation, will run with elevated priviliges)'
     },
 
     'localInstall': {
@@ -84,7 +90,7 @@ var opts = require("nomnom")
 
   }).parse();
 
-packageMsi(opts, function (err) {
+packageMsi(opts, function(err) {
   if (err) throw err
   console.log('Outputed to ' + path.resolve(opts.output))
 })
