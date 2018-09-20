@@ -73,7 +73,15 @@ var opts = require("nomnom")
       help: 'Install per user (no administrator rights required)',
       abbr: 'l',
 
-    }
+    },
+
+    'debug': {
+      abbr: 'd',
+      flag: true,
+      full: 'debug',
+      help: 'Debug Mode'
+    },
+
   }).parse();
 
 packageMsi(opts, function (err) {

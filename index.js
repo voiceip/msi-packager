@@ -30,6 +30,10 @@ module.exports = function(options, cb) {
 function writeXml(options, cb) {
   temp.open('msi-packager', function(err, info) {
     generateXml(options, function(err, xml) {
+
+      if(options.debug)
+        console.log(xml)
+
       fs.write(info.fd, xml, function(err) {
         if (err) return cb(err)
         
